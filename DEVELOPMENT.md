@@ -32,13 +32,13 @@ This creates `~/.vast/config.toml` with your VMS endpoint and credentials. Never
 ## Scaffold a new function
 
 ```bash
-vastde functions init python-pip <your-function-name>
+vastde functions init python-pip <lang>-<trigger>-<use-case>
 ```
 
 This generates:
 
 ```
-<your-function-name>/
+<lang>-<trigger>-<use-case>/
 ├── main.py          # Handler entry point (init and handler)
 ├── requirements.txt # Python dependencies
 ├── Aptfile          # System packages
@@ -105,7 +105,7 @@ Deploy via the DataEngine UI or CLI. See the per-function `README.md` for functi
 ## Logs
 
 ```bash
-vastde logs tail <pipeline> --function <your-function-name>
+vastde logs tail <pipeline> --function <lang>-<trigger>-<use-case>
 ```
 
 ## Run unit tests (optional)
