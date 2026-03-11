@@ -140,9 +140,13 @@ celerybeat.pid
 # DataEngine function config (may contain credentials)
 config.yaml
 
-# DataEngine build cache
+# DataEngine build artifacts
 .vast-build-cache
 .vast-build-cache/
+build.log
+
+# Claude Code local settings
+.claude/
 
 # Environments
 .env
