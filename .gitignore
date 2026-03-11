@@ -141,6 +141,7 @@ celerybeat.pid
 config.yaml
 
 # DataEngine build cache
+.vast-build-cache
 .vast-build-cache/
 
 # Environments

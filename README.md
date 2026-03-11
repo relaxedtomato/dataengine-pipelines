@@ -16,7 +16,7 @@ For a full overview, check out our recent blog post: [VAST DataEngine: Bringing 
 
 | Function | Trigger | Runtime | Status |
 |---|---|---|---|
-| [python-event-hello-world](functions/python-event-hello-world/) | Event (S3 upload) | Python 3.11 | coming soon |
+| [python-cron-hello-world](python-cron-hello-world/) | Cron | Python 3.11 | in-progress |
 
 > This table is generated from [`registry.json`](registry.json). Do not edit it manually.
 
@@ -24,15 +24,15 @@ For a full overview, check out our recent blog post: [VAST DataEngine: Bringing 
 
 ## Quick Start
 
-Browse the [functions](functions/) folder, pick one, and follow the README inside it.
+Browse the functions in this repo, pick one, and follow the README inside it.
 
 ---
 
 ## How to add a new function
 
-1. (Optional, but recommended) Copy the relevant template from [`_serverless_templates/`](_serverless_templates/) into `functions/your-function-name/`
+1. Scaffold a new function: `vastde functions init python-pip <your-function-name>`
 2. Implement `init()` and `handler()` in `main.py`
-3. Add an entry to [`registry.json`](registry.json) and open a PR against the `develop` branch
+3. Add an entry to [`registry.json`](registry.json) and open a PR against `main`
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and PR checklist.
 
@@ -42,7 +42,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and PR checklist.
 
 ```
 serverless-functions/
-├── python-event-hello-world/       # Each function is a self-contained folder
+├── python-cron-hello-world/        # Each function is a self-contained folder
 ├── python-event-starter/           # Reference scaffold, kept in sync with vastde CLI
 ├── scripts/
 │   └── validate_function.py        # Checks a function folder has all required files
