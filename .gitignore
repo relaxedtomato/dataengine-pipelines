@@ -134,6 +134,15 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# macOS
+.DS_Store
+
+# DataEngine function config (may contain credentials)
+config.yaml
+
+# DataEngine build cache
+.vast-build-cache/
+
 # Environments
 .env
 .envrc
