@@ -1,3 +1,5 @@
+<p align="center"><img src="vast.png" height="80" alt="alt text" /></p>
+
 # VAST DataEngine Pipelines
 
 A curated list of DataEngine pipeline examples — spanning reference pipelines from the VAST GitHub org and community contributions.
@@ -6,7 +8,7 @@ A curated list of DataEngine pipeline examples — spanning reference pipelines 
 
 [VAST DataEngine](https://www.vastdata.com/platform/dataengine) is a serverless computing platform built into the VAST [AI Operating System](https://www.vastdata.com/platform/ai-os):
 
-![alt text](dataengine.png)
+<p align="center"><img src="dataengine.png" alt="alt text" /></p>
 
 DataEngine lets you build, deploy, and scale data processing functions without managing infrastructure, running compute directly where data lives to eliminate costly data movement and duplication. The platform handles scheduling, event detection, and resource allocation so you can focus on business logic. At its core, DataEngine gives you three building blocks:
 - **Functions:** Your code built into container images and executed on VAST compute nodes (cnodes)
