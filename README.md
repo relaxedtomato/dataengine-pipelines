@@ -1,4 +1,4 @@
-<p align="center"><img src="vast.png" height="80" alt="alt text" /></p>
+<p align="center"><img src="vast.png" height="80" alt="alt text" style="background-color: white; padding: 8px; border-radius: 4px;" /></p>
 
 # VAST DataEngine Pipelines
 
