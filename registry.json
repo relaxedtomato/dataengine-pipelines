@@ -1,9 +1,9 @@
 [
   {
+    "section": "in-repo",
     "name": "python-cron-hello-world",
     "trigger": "cron",
     "runtime": "python3.11",
-    "status": "in-progress",
     "description": "Hello world function triggered on a cron schedule.",
     "path": "python-cron-hello-world"
   }

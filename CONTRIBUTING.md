@@ -1,17 +1,16 @@
-# Contributing to VAST DataEngine Serverless Functions
+# Contributing to VAST DataEngine Pipelines
 
-Thanks for taking the time to contribute! Whether you're fixing a bug, adding a new function, or improving docs, we appreciate it. 🎉
+Thanks for taking the time to contribute!
 
 ## Ways to contribute
 
-- **Report a bug** open an issue with the `bug` label
-- **Propose a new function** open an issue with the `function-idea` label
-- **Improve docs** open a PR directly for small fixes
-- **Submit a function** follow the steps below
+- **Report a bug** — open an issue with the `bug` label
+- **Link a pipeline** — add a row to the curated list by updating `registry.json`
+- **Improve docs** — open a PR directly for small fixes
 
 ## Before you start
 
-For new functions or significant changes, open an issue first so we can align before you write code. For typo fixes and small doc changes, a PR directly is fine.
+For new pipelines or significant changes, open an issue first so we can align. For typo fixes and small doc changes, a PR directly is fine.
 
 ## Branching
 
@@ -19,25 +18,23 @@ All branches target `main` directly. Never commit to `main` directly — always 
 
 | Type | Format | Example |
 |---|---|---|
-| New function | `feature/<name>` | `feature/python-event-hello-world` |
+| Link a pipeline | `link/<name>` | `link/vast-vector-ingest` |
 | Bug fix | `fix/<name>` | `fix/cron-timeout` |
 | Docs | `docs/<name>` | `docs/update-readme` |
 
 ## Commit message format
 
 ```
-feat(python-event-hello-world): add s3 upload handler
+link(vast-vector-ingest): add to VAST org pipelines
 fix(python-cron-hello-world): handle missing context
-docs(readme): update quick start section
+docs(readme): update contributing section
 ```
 
 ## PR checklist ✅
 
-Before opening a PR, make sure:
-
 - [ ] Your branch is up to date with `main`
-- [ ] `main.py` defines both `init()` and `handler()`
-- [ ] An entry has been added to `registry.json`
-- [ ] Your function folder has a `README.md` that includes step-by-step instructions to deploy and run the function (the happy path)
-- [ ] The serverless function has been tested end to end on DataEngine with no build or runtime errors when following the happy path
-- [ ] (optional, but recommended) Tests pass locally (i.e. `pytest tests/`)
+- [ ] An entry has been added to `registry.json` with the correct `section` (`in-repo`, `vast-org`, or `community`)
+- [ ] The pipeline has been verified to work on DataEngine
+- [ ] The linked repo has a README with necessary context and steps for someone to run the pipeline, ideally
+    - [ ] Ensure no secrets or credentials are present anywhere in the repos commit history — including in deleted branches, as dangling commits remain accessible in git
+    - [ ] CLI commands to 1) Build Function 2) Set up Trigger 3) Deploy Pipeline
