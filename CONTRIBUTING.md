@@ -35,6 +35,10 @@ docs(readme): update contributing section
 - [ ] Your branch is up to date with `main`
 - [ ] An entry has been added to `registry.json` with the correct `section` (`in-repo`, `vast-org`, or `community`)
 - [ ] The pipeline has been verified to work on DataEngine
-- [ ] The linked repo has a README with necessary context and steps for someone to run the pipeline, ideally
+- [ ] The linked repo has a README with necessary context and steps for someone to run the pipeline, so:
+    - [ ] `vastde` CLI commands to:
+        1. Build Function(s)
+        2. Set up Trigger(s)
+        3. Deploy Pipeline(s)
+        4. Sample file and command to trigger the pipeline (e.g. uploading a file via s3cmd)
     - [ ] Ensure no secrets or credentials are present anywhere in the repos commit history — including in deleted branches, as dangling commits remain accessible in git
-    - [ ] CLI commands to 1) Build Function 2) Set up Trigger 3) Deploy Pipeline

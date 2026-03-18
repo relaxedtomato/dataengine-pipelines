@@ -1,5 +1,7 @@
 # python-cron-hello-world
 
+> **Note:** This example is a work in progress and may be incomplete.
+
 ## Overview
 
 A hello world serverless function triggered on a cron schedule. Logs a greeting and environment variables on each invocation.
