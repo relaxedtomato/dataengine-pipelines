@@ -1,4 +1,4 @@
-<p align="center"><img src="vast.png" height="80" alt="alt text" style="background-color: white; padding: 8px; border-radius: 4px;" /></p>
+<p align="center"><img src="vast-logo.jpg" height="160" alt="alt text" style="background-color: white; padding: 8px; border-radius: 4px;" /></p>
 
 # VAST DataEngine Pipelines
 
@@ -25,7 +25,7 @@ For a full overview, check out our recent blog post: [VAST DataEngine: Bringing 
 
 ### In this repo
 
-Small, self-contained pipelines intended for training and workshop use.
+Small, self-contained pipelines intended for training and workshop use:
 
 | Pipeline | Trigger | Runtime | Description |
 |---|---|---|---|
@@ -33,16 +33,16 @@ Small, self-contained pipelines intended for training and workshop use.
 
 ### Reference Pipelines 
 
-Pipelines maintained by VAST and hosted across the VAST GitHub organization.
+Reference pipelines by VAST:
 
-| Pipeline | Trigger | Runtime | Repo |
+| Pipeline | Runtime | Repo | Description |
 |---|---|---|---|
 
 ### Community
 
-Pipelines built and maintained by the community.
+Pipelines built and maintained by the community:
 
-| Pipeline | Trigger | Runtime | Repo | Author |
+| Pipeline | Runtime | Repo | Author | Description |
 |---|---|---|---|---|
 
 ---
