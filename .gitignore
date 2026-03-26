@@ -1,3 +1,9 @@
+# in-repo WIP dataengine functions
+wip/
+
+# Generated CLI reference docs
+docs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
