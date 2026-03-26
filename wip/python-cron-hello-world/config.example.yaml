@@ -1,7 +1,0 @@
-envs:
-  GREETING: "Hello World"
-
-secrets:
-  credentials:
-    username: "myuser"
-    password: "mypassword"
