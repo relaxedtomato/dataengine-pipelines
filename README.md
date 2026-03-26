@@ -29,7 +29,6 @@ Small, self-contained pipelines intended for training and workshop use:
 
 | Pipeline | Trigger | Runtime | Description |
 |---|---|---|---|
-| [python-cron-hello-world](python-cron-hello-world/) | Cron | Python 3.11 | Hello world triggered on a cron schedule |
 
 ### Reference Pipelines 
 
@@ -59,7 +58,6 @@ To contribute, add an entry to [`registry.json`](registry.json) and open a PR ag
 
 ```
 dataengine-pipelines/
-├── python-cron-hello-world/        # Small, self-contained training pipeline
 ├── scripts/
 │   └── validate_function.py        # Checks a function folder has all required files
 └── registry.json                   # Machine-readable index of all pipelines
