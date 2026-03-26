@@ -1,3 +1,9 @@
+# in-repo WIP dataengine functions
+wip/
+
+# Generated CLI reference docs
+docs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -133,6 +139,20 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
+
+# macOS
+.DS_Store
+
+# DataEngine function config (may contain credentials)
+config.yaml
+
+# DataEngine build artifacts
+.vast-build-cache
+.vast-build-cache/
+build.log
+
+# Claude Code local settings
+.claude/
 
 # Environments
 .env

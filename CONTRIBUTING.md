@@ -1,0 +1,44 @@
+# Contributing to VAST DataEngine Pipelines
+
+Thanks for taking the time to contribute!
+
+## Ways to contribute
+
+- **Report a bug** — open an issue with the `bug` label
+- **Link a pipeline** — add a row to the curated list by updating `registry.json`
+- **Improve docs** — open a PR directly for small fixes
+
+## Before you start
+
+For new pipelines or significant changes, open an issue first so we can align. For typo fixes and small doc changes, a PR directly is fine.
+
+## Branching
+
+All branches target `main` directly. Never commit to `main` directly — always work on a branch and open a PR.
+
+| Type | Format | Example |
+|---|---|---|
+| Link a pipeline | `link/<name>` | `link/vast-vector-ingest` |
+| Bug fix | `fix/<name>` | `fix/cron-timeout` |
+| Docs | `docs/<name>` | `docs/update-readme` |
+
+## Commit message format
+
+```
+link(vast-vector-ingest): add to VAST org pipelines
+fix(python-cron-hello-world): handle missing context
+docs(readme): update contributing section
+```
+
+## PR checklist ✅
+
+- [ ] Your branch is up to date with `main`
+- [ ] An entry has been added to `registry.json` with the correct `section` (`in-repo`, `vast-org`, or `community`)
+- [ ] The pipeline has been verified to work on DataEngine
+- [ ] The linked repo has a README with necessary context and steps for someone to run the pipeline, so:
+    - [ ] `vastde` CLI commands to:
+        1. Build Function(s)
+        2. Set up Trigger(s)
+        3. Deploy Pipeline(s)
+        4. Sample file and command to trigger the pipeline (e.g. uploading a file via s3cmd)
+    - [ ] Ensure no secrets or credentials are present anywhere in the repos commit history — including in deleted branches, as dangling commits remain accessible in git
