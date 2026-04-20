@@ -1,0 +1,7 @@
+envs:
+  LLM_MODE: "mock"                 # toggle: local | remote | mock
+  LOCAL_LLM_ENDPOINT: ""           # e.g. http://host.docker.internal:11434
+  REMOTE_LLM_ENDPOINT: ""          # e.g. https://api.openai.com
+  LLM_API_KEY: ""                  # only needed for remote
+  MODEL_NAME: ""
+  MAX_TOKENS: "512"
