@@ -4,18 +4,27 @@ import boto3
 from openai import OpenAI
 
 EXPECTED_ENVS = [
-    'S3_MOCK', 'S3_ENDPOINT_URL', 'S3_ACCESS_KEY', 'S3_SECRET_KEY', 'S3_REGION',
-    'LLM_MOCK', 'LLM_ENDPOINT', 'LLM_API_KEY', 'MODEL_NAME', 'MAX_TOKENS',
+    'S3_MOCK', 'S3_ENDPOINT_URL', 'S3_REGION',
+    'LLM_MOCK', 'LLM_ENDPOINT', 'MODEL_NAME', 'MAX_TOKENS',
 ]
 
 def init(ctx):
     ctx.logger.info("🚀 Init")
+    ctx.logger.info(f"ℹ️ All env vars: {list(os.environ.keys())}")
+    ctx.logger.info(f"ℹ️ ctx attrs: {dir(ctx)}")
+    ctx.logger.info(f"ℹ️ ctx.__dict__: {ctx.__dict__}")
     for key in EXPECTED_ENVS:
         val = os.environ.get(key)
-        if key in ('S3_ACCESS_KEY', 'S3_SECRET_KEY', 'LLM_API_KEY'):
-            ctx.logger.info(f"ℹ️ {key}={'set' if val else 'NOT SET'}")
-        else:
-            ctx.logger.info(f"ℹ️ {key}={val if val is not None else 'NOT SET'}")
+        ctx.logger.info(f"ℹ️ {key}={val if val is not None else 'NOT SET'}")
+
+    # Load secrets
+    secrets = ctx.secrets.get("secrets", {})
+    s3_access_key = secrets.get("S3_ACCESS_KEY", "")
+    s3_secret_key = secrets.get("S3_SECRET_KEY", "")
+    llm_api_key   = secrets.get("LLM_API_KEY", "local")
+    ctx.logger.info(f"ℹ️ S3_ACCESS_KEY={'set' if s3_access_key else 'NOT SET'}")
+    ctx.logger.info(f"ℹ️ S3_SECRET_KEY={'set' if s3_secret_key else 'NOT SET'}")
+    ctx.logger.info(f"ℹ️ LLM_API_KEY={'set' if secrets.get('LLM_API_KEY') else 'NOT SET'}")
 
     # S3 client
     s3_mock = os.environ.get('S3_MOCK', 'false').lower() == 'true'
@@ -24,19 +33,22 @@ def init(ctx):
 
     if not s3_mock:
         s3_endpoint = os.environ.get('S3_ENDPOINT_URL')
-        s3_access_key = os.environ.get('S3_ACCESS_KEY')
         s3_region = os.environ.get('S3_REGION')
         ctx.logger.info(f"ℹ️ S3_ENDPOINT_URL={s3_endpoint}")
-        ctx.logger.info(f"ℹ️ S3_ACCESS_KEY={'set' if s3_access_key else 'NOT SET'}")
-        ctx.logger.info(f"ℹ️ S3_SECRET_KEY={'set' if os.environ.get('S3_SECRET_KEY') else 'NOT SET'}")
         ctx.logger.info(f"ℹ️ S3_REGION={s3_region}")
+        if not s3_access_key or not s3_secret_key:
+            ctx.logger.error("⚠️ S3_ACCESS_KEY or S3_SECRET_KEY missing from secrets")
+            raise ValueError("Missing required S3 secrets")
+        if not s3_endpoint:
+            ctx.logger.error("⚠️ S3_ENDPOINT_URL missing")
+            raise ValueError("Missing S3_ENDPOINT_URL")
         ctx.s3_client = boto3.client(
             's3',
             use_ssl=False,
             endpoint_url=s3_endpoint,
-            aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
-            aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
-            region_name=os.environ.get('S3_REGION'),
+            aws_access_key_id=s3_access_key,
+            aws_secret_access_key=s3_secret_key,
+            region_name=s3_region,
             config=boto3.session.Config(
                 signature_version='s3v4',
                 s3={'addressing_style': 'path'}
@@ -53,11 +65,10 @@ def init(ctx):
 
     if not llm_mock:
         endpoint = os.environ.get('LLM_ENDPOINT', '')
-        api_key = os.environ.get('LLM_API_KEY', 'local')
         if not endpoint:
             ctx.logger.error("⚠️ LLM_ENDPOINT missing")
             raise ValueError("Missing LLM_ENDPOINT")
-        ctx.llm_client = OpenAI(base_url=f"{endpoint}/v1", api_key=api_key)
+        ctx.llm_client = OpenAI(base_url=f"{endpoint}/v1", api_key=llm_api_key)
         ctx.logger.info(f"✅ LLM client initialized → {endpoint}")
     else:
         ctx.llm_client = None
