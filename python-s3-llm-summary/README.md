@@ -1,3 +1,5 @@
+# python-s3-llm-summary
+
 ## Overview
 
 An S3-triggered pipeline that reads uploaded files and returns an LLM-generated summary on each object creation event.
@@ -25,6 +27,7 @@ An S3-triggered pipeline that reads uploaded files and returns an LLM-generated 
     |- pipeline-config.yaml  # Pipeline definition (trigger → function wiring)
     |- README.md             # This file
     |- sample.txt            # Sample text file for local testing
+    |- cloudevent.json       # Sample CloudEvent for local testing with `vastde functions invoke`
 
 ## Configuration
 
@@ -40,11 +43,15 @@ Never commit `config.yaml`. It is already included in `.gitignore`.
 
 | Variable | Required | Description |
 |---|---|---|
-| `LLM_MODE` | Yes | Toggle: `local`, `remote`, or `mock` |
-| `LOCAL_LLM_ENDPOINT` | When `LLM_MODE=local` | Local LLM server URL (e.g. `http://host.docker.internal:11434`) |
-| `REMOTE_LLM_ENDPOINT` | When `LLM_MODE=remote` | Remote OpenAI-compatible API URL |
-| `LLM_API_KEY` | When `LLM_MODE=remote` | API key for the remote LLM endpoint |
-| `MODEL_NAME` | Yes | Model name (e.g. `llama3.2`, `gpt-4o-mini`) |
+| `S3_MOCK` | No | Set to `true` to use local `sample.txt` instead of real S3 (default: `false`) |
+| `S3_ENDPOINT_URL` | When `S3_MOCK=false` | S3 endpoint URL (e.g. `http://s3.your-endpoint.com`) |
+| `S3_ACCESS_KEY` | When `S3_MOCK=false` | S3 access key |
+| `S3_SECRET_KEY` | When `S3_MOCK=false` | S3 secret key |
+| `S3_REGION` | No | S3 region (e.g. `us-east-1`) |
+| `LLM_MOCK` | No | Set to `false` to call a real LLM endpoint (default: `true`) |
+| `LLM_ENDPOINT` | When `LLM_MOCK=false` | LLM base URL (e.g. `http://host.docker.internal:11434` or `https://api.openai.com`) |
+| `LLM_API_KEY` | When `LLM_MOCK=false` | API key — optional for local endpoints, required for remote |
+| `MODEL_NAME` | When `LLM_MOCK=false` | Model name (e.g. `llama3.2`, `gpt-4o-mini`) |
 | `MAX_TOKENS` | No | Max tokens for the LLM response (default: `512`) |
 
 ## Run Function on DataEngine
@@ -164,7 +171,7 @@ vastde pipelines create --config pipeline-config.yaml
 # vastde pipelines create output
 Pipeline created: $USER-s3-llm-summary-pipeline
 Name: $USER-s3-llm-summary-pipeline
-Description: A sample pipeline to print hello world on a s3 element created event
+Description: A sample pipeline to summarize body of text on a s3 element created event
 Tags: [element-created]
 GUID: df31058f-9e34-48f0-97ea-7222138e5bff
 Owner: [id: 477, id-type: vid]
@@ -193,9 +200,10 @@ vastde logs tail $USER-s3-llm-summary-pipeline --function $USER-s3-llm-summary -
 
 ```bash
 # vastde logs tail output
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MODE=mock
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ Mocking LLM response
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] Initialized in mock mode
+2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ S3_MOCK=false
+2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ✅ S3 client initialized
+2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true
+2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true, skipping LLM client init
 ```
 
 ### 4. Test Pipeline with S3 file upload
@@ -218,8 +226,14 @@ vastde logs tail $USER-s3-llm-summary-pipeline --function $USER-s3-llm-summary -
 
 ```bash
 # vastde logs tail output
-2026-04-19 17:58:09.97 [ram-s3-llm-summary] [INFO]  [user] ℹ️ Handler called: {'attributes': {'source': 'vastdata.com:ram-s3-llm-summary-trigger.c1e77e6e-881a-4635-b990-e606700add03', 'id': '1231818095329284', 'type': 'vastdata.com:Element.ElementCreated', 'specversion': '1.0', 'time': '2026-04-19T21:58:09.865106+00:00', 'subject': 'vast-broker-engine-broker.main', 'datacontenttype': 'application/json', 'dataschema': None, 'elementhandle': '16945152759396806825', 'elementpath': 'ram-dev/sample.txt', 'elementsourcetype': 'vast:s3', 'knativekafkaoffset': '3173905', 'knativekafkapartition': '1'}, 'data': {'Records': [{'eventVersion': '2.2', 'eventSource': 'vast:s3', 'awsRegion': 'selab-var-201', 'eventTime': '2026-04-19T21:58:09.865106Z', 'eventName': 'ObjectCreated:Put', 'userIdentity': {'principalId': 'ram.bansal@selab.vastdata.com'}, 'requestParameters': {'sourceIPAddress': '172.200.11.10'}, 'responseElements': {'x-amz-request-id': '0x46051003bcc73', 'x-amz-id-2': '0x46051003bcc73'}, 's3': {'s3SchemaVersion': '1.0', 'configurationId': 'ram-s3-llm-summary-trigger.c1e77e6e-881a-4635-b990-e606700add03', 'bucket': {'name': 'ram-dev', 'ownerIdentity': {'principalId': 'ram.bansal@selab.vastdata.com'}, 'arn': 'arn:aws:s3:::ram-dev'}, 'object': {'key': 'sample.txt', 'size': 1120, 'eTag': '77b32bf375f17f2bebdc481c1d8f21ea', 'sequencer': '006b00000000000f4349'}}}]}}
-2026-04-19 17:58:09.97 [ram-s3-llm-summary] [INFO]  [user] ↩️ Summary: [mock] This is a placeholder summary for local testing without an LLM.
+2026-04-19 17:58:09.97 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ Handler called: 2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ event.data={'Records': [{'eventVersion': '2.2', 'eventSource': 'vast:s3', 'awsRegion': 'selab-var-201', 'eventTime': '2026-04-22T01:01:51.230228Z', 'eventName': 'ObjectCreated:Put', 'userIdentity': {'principalId': '<userId>'}, 'requestParameters': {'sourceIPAddress': '172.200.11.10'}, 'responseElements': {'x-amz-request-id': '0x4519100011b86', 'x-amz-id-2': '0x4519100011b86'}, 's3': {'s3SchemaVersion': '1.0', 'configurationId': '$USER-dev-s3-upload.613d181e-7a4c-4899-baf0-04b7796bf1dd', 'bucket': {'name': '$USER-dev', 'ownerIdentity': {'principalId': '<userId>'}, 'arn': 'arn:aws:s3:::$USER-dev'}, 'object': {'key': 'sample10.txt', 'size': 1120, 'eTag': '77b32bf375f17f2bebdc481c1d8f21ea', 'sequencer': '007000000000000f4347'}}}]}
+2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] 📦 Bucket: $USER-dev
+2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] 📄 Key: sample10.txt
+2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] ⬇️ Fetching file from S3...
+2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] ✅ File fetched — size: 1120 bytes, type: text/plain
+2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] 🤖 Calling LLM for summary...
+2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true — returning placeholder summary
+2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] ✅ Summary: [mock] This is a placeholder summary for local testing without an LLM.
 ```
 
 ## Local Development
@@ -240,6 +254,11 @@ vastde functions localrun $USER-s3-llm-summary -c config.yaml
 
 ```bash
 vastde functions invoke --generate-event --url http://localhost:8080/
+```
+
+```bash
+# or with a custom event matching the DataEngine S3 trigger format:
+vastde functions invoke --event ./cloudevent.json --url http://localhost:8080/
 ```
 
 ## Resources
