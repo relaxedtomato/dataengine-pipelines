@@ -8,7 +8,7 @@ An S3-triggered pipeline that reads uploaded files and returns an LLM-generated 
 |---|---|
 | **Trigger** | S3 Create Event  |
 | **Runtime** | Python 3.12.12 |
-| **Status** | In Progress |
+| **Status** | Complete |
 
 ## Prerequisites
 
@@ -28,6 +28,7 @@ An S3-triggered pipeline that reads uploaded files and returns an LLM-generated 
     |- README.md             # This file
     |- sample.txt            # Sample text file for local testing
     |- cloudevent.json       # Sample CloudEvent for local testing with `vastde functions invoke`
+    |- secrets.example.yaml  # Secrets template, copy to secrets.yaml and fill in values
 
 ## Configuration
 
@@ -45,14 +46,27 @@ Never commit `config.yaml`. It is already included in `.gitignore`.
 |---|---|---|
 | `S3_MOCK` | No | Set to `true` to use local `sample.txt` instead of real S3 (default: `false`) |
 | `S3_ENDPOINT_URL` | When `S3_MOCK=false` | S3 endpoint URL (e.g. `http://s3.your-endpoint.com`) |
-| `S3_ACCESS_KEY` | When `S3_MOCK=false` | S3 access key |
-| `S3_SECRET_KEY` | When `S3_MOCK=false` | S3 secret key |
 | `S3_REGION` | No | S3 region (e.g. `us-east-1`) |
 | `LLM_MOCK` | No | Set to `false` to call a real LLM endpoint (default: `true`) |
 | `LLM_ENDPOINT` | When `LLM_MOCK=false` | LLM base URL (e.g. `http://host.docker.internal:11434` or `https://api.openai.com`) |
-| `LLM_API_KEY` | When `LLM_MOCK=false` | API key — optional for local endpoints, required for remote |
 | `MODEL_NAME` | When `LLM_MOCK=false` | Model name (e.g. `llama3.2`, `gpt-4o-mini`) |
 | `MAX_TOKENS` | No | Max tokens for the LLM response (default: `512`) |
+
+### Secrets
+
+Copy `secrets.example.yaml` to `secrets.yaml` and fill in your values:
+
+```bash
+cp secrets.example.yaml secrets.yaml
+```
+
+Never commit `secrets.yaml`. It is already included in `.gitignore`.
+
+| Secret | Required | Description |
+|---|---|---|
+| `S3_ACCESS_KEY` | When `S3_MOCK=false` | S3 access key |
+| `S3_SECRET_KEY` | When `S3_MOCK=false` | S3 secret key |
+| `LLM_API_KEY` | When `LLM_MOCK=false` | API key, optional for local endpoints and required for remote |
 
 ## Run Function on DataEngine
 
@@ -200,10 +214,10 @@ vastde logs tail $USER-s3-llm-summary-pipeline --function $USER-s3-llm-summary -
 
 ```bash
 # vastde logs tail output
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ S3_MOCK=false
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ✅ S3 client initialized
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true
-2026-04-19 16:46:26.70 [ram-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true, skipping LLM client init
+2026-04-19 16:46:26.70 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ S3_MOCK=false
+2026-04-19 16:46:26.70 [$USER-s3-llm-summary] [INFO]  [user] ✅ S3 client initialized
+2026-04-19 16:46:26.70 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true
+2026-04-19 16:46:26.70 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true, skipping LLM client init
 ```
 
 ### 4. Test Pipeline with S3 file upload
@@ -226,14 +240,15 @@ vastde logs tail $USER-s3-llm-summary-pipeline --function $USER-s3-llm-summary -
 
 ```bash
 # vastde logs tail output
-2026-04-19 17:58:09.97 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ Handler called: 2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ event.data={'Records': [{'eventVersion': '2.2', 'eventSource': 'vast:s3', 'awsRegion': 'selab-var-201', 'eventTime': '2026-04-22T01:01:51.230228Z', 'eventName': 'ObjectCreated:Put', 'userIdentity': {'principalId': '<userId>'}, 'requestParameters': {'sourceIPAddress': '172.200.11.10'}, 'responseElements': {'x-amz-request-id': '0x4519100011b86', 'x-amz-id-2': '0x4519100011b86'}, 's3': {'s3SchemaVersion': '1.0', 'configurationId': '$USER-dev-s3-upload.613d181e-7a4c-4899-baf0-04b7796bf1dd', 'bucket': {'name': '$USER-dev', 'ownerIdentity': {'principalId': '<userId>'}, 'arn': 'arn:aws:s3:::$USER-dev'}, 'object': {'key': 'sample10.txt', 'size': 1120, 'eTag': '77b32bf375f17f2bebdc481c1d8f21ea', 'sequencer': '007000000000000f4347'}}}]}
-2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] 📦 Bucket: $USER-dev
-2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] 📄 Key: sample10.txt
-2026-04-21 21:01:51.31 [$USER-s3-llm-summary] [INFO]  [user] ⬇️ Fetching file from S3...
-2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] ✅ File fetched — size: 1120 bytes, type: text/plain
-2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] 🤖 Calling LLM for summary...
-2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] ℹ️ LLM_MOCK=true — returning placeholder summary
-2026-04-21 21:01:51.34 [$USER-s3-llm-summary] [INFO]  [user] ✅ Summary: [mock] This is a placeholder summary for local testing without an LLM.
+2026-04-26 16:04:04.08 [$USER-s3-llm-summar...] [INFO]  [user] ℹ️ Handler invoked
+2026-04-26 16:04:04.08 [$USER-s3-llm-summar...] [INFO]  [user] ℹ️ event.data={'Records': [{'eventVersion': '2.2', 'eventSource': 'vast:s3', 'awsRegion': 'selab-var-201', 'eventTime': '2026-04-26T18:47:12.113150Z', 'eventName': 'ObjectCreated:Put', 'userIdentity': {'principalId': '<id>'}, 'requestParameters': {'sourceIPAddress': '172.200.11.10'}, 'responseElements': {'x-amz-request-id': '0x4d15100003adf', 'x-amz-id-2': '0x4d15100003adf'}, 's3': {'s3SchemaVersion': '1.0', 'configurationId': '$USER-s3-llm-summary-trigger.c1e77e6e-881a-4635-b990-e606700add03', 'bucket': {'name': '$USER-dev', 'ownerIdentity': {'principalId': 'ram.bansal@selab.vastdata.com'}, 'arn': 'arn:aws:s3:::$USER-dev'}, 'object': {'key': 'sample25.txt', 'size': 1120, 'eTag': '77b32bf375f17f2bebdc481c1d8f21ea', 'sequencer': '00f100000000000f43a7'}}}]}
+2026-04-26 16:04:04.08 [$USER-s3-llm-summar...] [INFO]  [user] 📦 Bucket: $USER-dev
+2026-04-26 16:04:04.08 [$USER-s3-llm-summar...] [INFO]  [user] 📄 Key: sample25.txt
+2026-04-26 16:04:04.08 [$USER-s3-llm-summar...] [INFO]  [user] ⬇️ Fetching file from S3...
+2026-04-26 16:04:04.11 [$USER-s3-llm-summar...] [INFO]  [user] ✅ File fetched — size: 1120 bytes, type: text/plain
+2026-04-26 16:04:04.11 [$USER-s3-llm-summar...] [INFO]  [user] 🤖 Calling LLM for summary...
+2026-04-26 16:04:04.12 [$USER-s3-llm-summar...] [INFO]  [user] ℹ️ Model: nvidia/llama-3.1-8b-instruct, MaxTokens: 512
+2026-04-26 16:04:29.63 [$USER-s3-llm-summar...] [INFO]  [user] ✅ Summary: The given text appears to be a passage of Lorem Ipsum, a filler text used for demonstration purposes in design and typography. It consists of two sections of descriptive text, describing various design elements and layouts.
 ```
 
 ## Local Development

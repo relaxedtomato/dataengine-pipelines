@@ -23,7 +23,7 @@
         "runtime": "Python 3.12.12",
         "trigger": "s3",
         "description": "Pipeline with S3 trigger that summarizes file contents using an LLM.",
-        "status": "in-progress",
+        "status": "ready",
         "link": "https://github.com/vast-data/dataengine-pipelines/tree/main/python-s3-llm-summary"
     },
     {

@@ -10,9 +10,6 @@ EXPECTED_ENVS = [
 
 def init(ctx):
     ctx.logger.info("🚀 Init")
-    ctx.logger.info(f"ℹ️ All env vars: {list(os.environ.keys())}")
-    ctx.logger.info(f"ℹ️ ctx attrs: {dir(ctx)}")
-    ctx.logger.info(f"ℹ️ ctx.__dict__: {ctx.__dict__}")
     for key in EXPECTED_ENVS:
         val = os.environ.get(key)
         ctx.logger.info(f"ℹ️ {key}={val if val is not None else 'NOT SET'}")
@@ -21,7 +18,7 @@ def init(ctx):
     secrets = ctx.secrets.get("secrets", {})
     s3_access_key = secrets.get("S3_ACCESS_KEY", "")
     s3_secret_key = secrets.get("S3_SECRET_KEY", "")
-    llm_api_key   = secrets.get("LLM_API_KEY", "local")
+    llm_api_key   = secrets.get("LLM_API_KEY", "")
     ctx.logger.info(f"ℹ️ S3_ACCESS_KEY={'set' if s3_access_key else 'NOT SET'}")
     ctx.logger.info(f"ℹ️ S3_SECRET_KEY={'set' if s3_secret_key else 'NOT SET'}")
     ctx.logger.info(f"ℹ️ LLM_API_KEY={'set' if secrets.get('LLM_API_KEY') else 'NOT SET'}")
@@ -68,7 +65,7 @@ def init(ctx):
         if not endpoint:
             ctx.logger.error("⚠️ LLM_ENDPOINT missing")
             raise ValueError("Missing LLM_ENDPOINT")
-        ctx.llm_client = OpenAI(base_url=f"{endpoint}/v1", api_key=llm_api_key)
+        ctx.llm_client = OpenAI(base_url=endpoint, api_key=llm_api_key)
         ctx.logger.info(f"✅ LLM client initialized → {endpoint}")
     else:
         ctx.llm_client = None
@@ -104,7 +101,6 @@ def handler(ctx, event):
             ctx.logger.error(f"⚠️ Error fetching file: {e}")
             return f"Error fetching file: {e}"
 
-    # Summarize
     ctx.logger.info("🤖 Calling LLM for summary...")
     summary = llm_summary(ctx, content)
     ctx.logger.info(f"✅ Summary: {summary}")
@@ -121,15 +117,19 @@ def llm_summary(ctx, content):
     ctx.logger.info(f"ℹ️ Model: {model}, MaxTokens: {max_tokens}")
 
     query = f"Summarize in 1-2 sentences:\n{content}"
-    completion = ctx.llm_client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": query}],
-        max_tokens=max_tokens,
-        stream=True,
-    )
-    out = "".join(
-        chunk.choices[0].delta.content
-        for chunk in completion
-        if chunk.choices[0].delta.content
-    )
-    return out.split("</think>")[-1].strip()
+    try:
+        completion = ctx.llm_client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": query}],
+            max_tokens=max_tokens,
+            stream=True,
+        )
+        out = "".join(
+            chunk.choices[0].delta.content
+            for chunk in completion
+            if chunk.choices[0].delta.content
+        )
+        return out.split("</think>")[-1].strip()
+    except Exception as e:
+        ctx.logger.error(f"⚠️ LLM call failed: {e}")
+        return f"Error: LLM call failed — {e}"
